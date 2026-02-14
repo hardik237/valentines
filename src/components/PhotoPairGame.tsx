@@ -58,9 +58,17 @@ export default function PhotoPairGame({
   const [matched, setMatched] = useState<number[]>([]);
   const [incorrect, setIncorrect] = useState<number[]>([]);
   const [images] = useState(() => shuffleArray([...imagePairs]));
+  const [isPreviewing, setIsPreviewing] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPreviewing(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClick = async (index: number) => {
-    if (selected.length === 2 || matched.includes(index) || selected.includes(index)) return;
+    if (isPreviewing || selected.length === 2 || matched.includes(index) || selected.includes(index)) return;
 
     if (selected.length === 1) {
       const firstIndex = selected[0];
@@ -114,10 +122,10 @@ export default function PhotoPairGame({
             style={{ perspective: "1000px" }} // Add perspective for 3D effect
           >
             {/* Back of the card */}
-            {!selected.includes(index) && !matched.includes(index) && (
+            {!selected.includes(index) && !matched.includes(index) && !isPreviewing && (
               <motion.div
                 className="w-full h-full bg-gray-300 rounded-sm lg:rounded-md absolute z-10"
-                initial={{ rotateY: 0 }}
+                initial={{ rotateY: 180 }}
                 animate={{
                   rotateY:
                     selected.includes(index) || matched.includes(index)
@@ -130,7 +138,7 @@ export default function PhotoPairGame({
             )}
 
             {/* Front of the card (image) */}
-            {(selected.includes(index) || matched.includes(index)) && (
+            {(selected.includes(index) || matched.includes(index) || isPreviewing) && (
               <motion.div
                 className="w-full h-full absolute"
                 initial={{ rotateY: -180 }}
